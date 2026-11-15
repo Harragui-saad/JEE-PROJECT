@@ -1,0 +1,38 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:native}
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_GIT_URI:https://github.com/dummy/dummy.git}
+          default-label: ${CONFIG_GIT_LABEL:main}
+          username: ${CONFIG_GIT_USERNAME:}
+          password: ${CONFIG_GIT_PASSWORD:}
+          clone-on-start: false
+          force-pull: true
+          refresh-rate: ${CONFIG_GIT_REFRESH_RATE:30}
+          timeout: 10
+
+        # LOCAL FILES backend: serves the config-repo/ folder packaged in the jar or specified by CONFIG_REPO
+        native:
+          search-locations: ${CONFIG_REPO:classpath:/config-repo/}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
