@@ -1,0 +1,53 @@
+ticketflow:
+  clients:
+    event-service:
+      url: ${EVENT_SERVICE_URL:}
+  resilience:
+    event-service:
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      failure-rate-threshold: 50
+      wait-in-open-state: 10s
+      permitted-calls-in-half-open-state: 3
+      time-limit: 4s
+    payment-service:
+      wait-in-open-state: 10s
+
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            connect-timeout: 1000
+            read-timeout: 3000
+          default:
+            logger-level: full
+            connect-timeout: 2000
+            read-timeout: 3000
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketflow_booking_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    com.ticketflow.bookingservice.clients.EventClient: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,circuitbreakers,circuitbreakerevents
